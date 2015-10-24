@@ -6,6 +6,7 @@
             It does not rely on any vendor-specific features and can
             therefore be deployed to any persistence provider.
       </description>
+
       <class>com.chevtech.jpa.model.Book</class>
       <properties>
       	<property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.0.4:13306/mydb"/>

@@ -1,2 +1,3 @@
 # jpa-playground
-test
+
+Messing around with JPA, Hibernate, Maven.
