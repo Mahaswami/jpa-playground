@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 public class Book implements Serializable {
-	@Id  
+	@Id  @GeneratedValue
 	private Integer id;
 	private String isbn;
 	private String title	;
@@ -21,6 +21,12 @@ public class Book implements Serializable {
 		super();
 	}   
   
+	public Book(String isbn, String title) {
+		super();
+		this.isbn= isbn;
+		this.title= title;
+	}   
+	
 	public Integer getId() {
 		return this.id;
 	}

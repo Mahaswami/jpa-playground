@@ -16,7 +16,7 @@ public class BookTests {
 
 	@Test
 	public void createBook() {
-		Book book = new Book();
+		Book book = new Book("isbn01", "title12");
 		BookService bs = new BookService();
 		bs.create(book);	
 	}
