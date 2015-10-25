@@ -1,7 +1,6 @@
 package com.chevtech.jpa.model;
 
 import java.io.Serializable;
-import java.lang.Integer;
 import java.lang.String;
 import javax.persistence.*;
 
@@ -9,10 +8,10 @@ import javax.persistence.*;
  * Entity implementation class for Entity: Book
  *
  */
-@Entity
+@Entity 
 public class Book implements Serializable {
 	@Id  @GeneratedValue
-	private Integer id;
+	private long id;
 	private String isbn;
 	private String title	;
 	private static final long serialVersionUID = 1L;
@@ -27,7 +26,7 @@ public class Book implements Serializable {
 		this.title= title;
 	}   
 	
-	public Integer getId() {
+	public long getId() {
 		return this.id;
 	}
  
