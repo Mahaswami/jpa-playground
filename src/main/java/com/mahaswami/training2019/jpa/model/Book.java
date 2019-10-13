@@ -1,4 +1,4 @@
-package com.chevtech.jpa.model;
+package com.mahaswami.training2019.jpa.model;
 
 import java.io.Serializable;
 import java.lang.String;
