@@ -23,108 +23,17 @@ public class Main {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Screen screen = null;
 
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("Publisher");
+        EntityManager em = emf.createEntityManager();
+
         try {
             screen = terminalFactory.createScreen();
             screen.startScreen();
             final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
 
             final Window window = new BasicWindow("Valluvar Bookstore");
-
-            MenuBar menubar = new MenuBar();
-
-            // "File" menu
-            Menu menuFile = new Menu("File");
-            menubar.addMenu(menuFile);
-            menuFile.addMenuItem("Books...", () -> {
-                    BasicWindow booksWindow = new BasicWindow("Books");
-                    booksWindow.setCloseWindowWithEscape(true);
-                    booksWindow.setHints(Arrays.asList(Window.Hint.FULL_SCREEN));
-                    Panel panel = new Panel();
-                    Table<String> table = new Table<String>("ID", "Title", "ISBN");;
-
-                    EntityManagerFactory emf = Persistence.createEntityManagerFactory("Publisher");
-                    EntityManager em = emf.createEntityManager();
-                    Query books = em.createNamedQuery("all_books");
-                    List<Book> list = books.getResultList();
-
-                    for (Book b: list) {
-                        table.getTableModel().addRow(String.valueOf(b.getId()), b.getTheTitle(), b.getIsbn());
-                    }
-                    panel.addComponent(table);
-                    panel.addComponent(new Button("Add Book", () -> {
-                            //MessageDialog.showMessageDialog(textGUI, "MessageBox", "This is a message box", MessageDialogButton.OK);
-
-                        BasicWindow addWindow = new BasicWindow("Add Book");
-                        addWindow.setCloseWindowWithEscape(true);
-                        addWindow.setHints(Arrays.asList(Window.Hint.FULL_SCREEN));
-
-                        Panel contentPanel = new Panel(new GridLayout(2));
-
-                        GridLayout gridLayout = (GridLayout)contentPanel.getLayoutManager();
-                        gridLayout.setHorizontalSpacing(3);
-
-                        contentPanel.addComponent(new Label("Book Title"));
-                        TextBox textTitle = new TextBox(new TerminalSize(30,1));
-                        contentPanel.addComponent(
-                                textTitle
-                                        .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.CENTER)));
-
-                        contentPanel.addComponent(new Label("Book ISBN"));
-                        TextBox textISBN = new TextBox(new TerminalSize(30,1));
-                        contentPanel.addComponent(
-                                textISBN
-                                        .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.CENTER)));
-
-                        contentPanel.addComponent(
-                                new Button("Save", () ->{
-                                    Book newBook = new Book();
-                                    newBook.setTheTitle(textTitle.getText());
-                                    newBook.setIsbn(textISBN.getText());
-                                    em.getTransaction().begin();
-                                    em.persist(newBook);
-                                    em.getTransaction().commit();
-
-                                    Query findByISBN = em.createNamedQuery("find_book_by_isbn");
-                                    findByISBN.setParameter("isbn", newBook.getIsbn());
-                                    Book foundBook = (Book)findByISBN.getResultList().get(0);
-                                    table.getTableModel().addRow(String.valueOf(foundBook.getId()), foundBook.getTheTitle(), foundBook.getIsbn());
-                                    addWindow.close();
-
-                                }).setLayoutData(
-                                        GridLayout.createHorizontallyEndAlignedLayoutData(2)));
-
-                        addWindow.setComponent(contentPanel);
-                        textGUI.addWindowAndWait(addWindow);
-
-                    }));
-                    panel.addComponent(new Button("Delete Book", () -> {
-                        List<String> data = table.getTableModel().getRow(table.getSelectedRow());
-                        String bookId = data.get(0);
-                        MessageDialog.showMessageDialog(textGUI, "Book", "About to Delete Book ID: "  + bookId, MessageDialogButton.OK);
-                        Query deleteQuery = em.createNamedQuery("find_book_by_id");
-                        deleteQuery.setParameter("id", new Long(bookId));
-                        Book book = (Book)deleteQuery.getResultList().get(0);
-                        em.remove(book);
-                        table.getTableModel().removeRow(table.getSelectedRow());
-                    }));
-                    booksWindow.setComponent(panel);
-                    textGUI.addWindowAndWait(booksWindow);
-                }
-            );
-            menuFile.addMenuItem("Exit", () -> {
-                    System.exit(0);
-            });
-
-            // "Help" menu
-            Menu menuHelp = new Menu("Help");
-            menubar.addMenu(menuHelp);
-            menuHelp.addMenuItem("About", () -> {
-                    MessageDialog.showMessageDialog(
-                            textGUI, "About", "Valluvar Bookstore by Mahaswami Software", MessageDialogButton.OK);
-            });
-
+            MenuBar menubar = buildMenuBar(textGUI, em);
             window.setComponent(menubar);
-
             textGUI.addWindowAndWait(window);
 
         }
@@ -141,6 +50,31 @@ public class Main {
                 }
             }
         }
+    }
+
+    private static MenuBar buildMenuBar(WindowBasedTextGUI textGUI, EntityManager em) {
+        MenuBar menubar = new MenuBar();
+
+        // "File" menu
+        Menu menuFile = new Menu("File");
+        menubar.addMenu(menuFile);
+        menuFile.addMenuItem("Books...", () -> {
+                    new BooksWindow(textGUI, em);
+                }
+        );
+
+        menuFile.addMenuItem("Exit", () -> {
+                System.exit(0);
+        });
+
+        // "Help" menu
+        Menu menuHelp = new Menu("Help");
+        menubar.addMenu(menuHelp);
+        menuHelp.addMenuItem("About", () -> {
+                MessageDialog.showMessageDialog(
+                        textGUI, "About", "Valluvar Bookstore by Mahaswami Software", MessageDialogButton.OK);
+        });
+        return menubar;
     }
 
     public static void mainOld(String[] args) {
