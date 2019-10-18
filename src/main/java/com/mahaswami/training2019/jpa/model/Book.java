@@ -3,12 +3,18 @@ package com.mahaswami.training2019.jpa.model;
 import java.io.Serializable;
 import java.lang.String;
 import javax.persistence.*;
+import javax.persistence.NamedQuery;
 
 /**
  * Entity implementation class for Entity: Book
  *
  */
-@Entity 
+@Entity
+
+@NamedQuery(query = "Select b from Book b", name = "all_books")
+@NamedQuery(query = "Select b from Book b where b.id = :id", name = "find_book_by_id")
+@NamedQuery(query = "Select b from Book b where b.isbn = :isbn", name = "find_book_by_isbn")
+
 public class Book implements Serializable {
 	@Id  @GeneratedValue
 	private long id;
