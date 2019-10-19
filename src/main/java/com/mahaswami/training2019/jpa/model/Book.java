@@ -5,10 +5,6 @@ import java.lang.String;
 import javax.persistence.*;
 import javax.persistence.NamedQuery;
 
-/**
- * Entity implementation class for Entity: Book
- *
- */
 @Entity
 
 @NamedQuery(query = "Select b from Book b", name = "all_books")
