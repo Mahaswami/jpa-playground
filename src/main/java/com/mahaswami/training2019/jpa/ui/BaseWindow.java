@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.mahaswami.training2019.jpa.model.User;
+import com.mahaswami.training2019.jpa.service.RocketService;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -19,11 +20,13 @@ public abstract class BaseWindow {
     protected Table<String> table = null;
     protected Panel contentPanel = null;
     protected User currentUser;
+    protected RocketService rocketService;
 
-    public BaseWindow(WindowBasedTextGUI textGUI, EntityManager em, User curentUser) {
+    public BaseWindow(WindowBasedTextGUI textGUI, EntityManager em, RocketService rocketService, User curentUser) {
         this.textGUI = textGUI;
         this.em = em;
         this.currentUser = curentUser;
+        this.rocketService = rocketService;
         BasicWindow myWindow = new BasicWindow(getTitle());
 
         if(curentUser != null) {
@@ -80,7 +83,7 @@ public abstract class BaseWindow {
             contentPanel.addComponent(
                     new Button("Cancel", () -> {
                         loginWindow.close();
-                        Main.login(em);
+                        Main.login(em, rocketService);
                     }).setLayoutData(
                             GridLayout.createHorizontallyEndAlignedLayoutData(2)));
 

@@ -6,13 +6,14 @@ import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.mahaswami.training2019.jpa.model.User;
+import com.mahaswami.training2019.jpa.service.RocketService;
 
 import javax.persistence.EntityManager;
 
 public class LoginWindow extends BaseWindow {
 
-    public LoginWindow(WindowBasedTextGUI textGUI, EntityManager em, User currentUser) {
-        super(textGUI, em, currentUser);
+    public LoginWindow(WindowBasedTextGUI textGUI, EntityManager em, RocketService rocketService, User currentUser) {
+        super(textGUI, em, rocketService, currentUser);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class LoginWindow extends BaseWindow {
         user.setUsername(((TextBox)uiFields.get(0)).getText());
         user.setPassword(((TextBox)uiFields.get(1)).getText());
         Main.currentUser = user;
-        Main.start(em);
+        Main.start(em, rocketService);
     }
 
     @Override

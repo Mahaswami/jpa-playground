@@ -2,14 +2,18 @@ package com.mahaswami.training2019.jpa.ui;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.menu.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
+import com.googlecode.lanterna.gui2.menu.Menu;
+import com.googlecode.lanterna.gui2.menu.MenuBar;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.mahaswami.training2019.jpa.model.User;
+import com.mahaswami.training2019.jpa.service.RocketService;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,14 +30,16 @@ public class Main {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("Publisher");
         EntityManager em = emf.createEntityManager();
+        RocketService rocketService = new RocketService(em);
+
         try {
             screen = terminalFactory.createScreen();
             screen.startScreen();
 
             if (currentUser != null){
-                start(em);
+                start(em, rocketService);
             }else {
-                login(em);
+                login(em, rocketService);
             }
 
         }
@@ -52,27 +58,27 @@ public class Main {
         }
     }
 
-    public static void start(EntityManager em) {
+    public static void start(EntityManager em, RocketService rocketService) {
         final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
         final Window window = new BasicWindow("Mahaswami Software Pvt. Ltd. (" + currentUser.getUsername() + ")");
-        MenuBar menubar = buildMenuBar(textGUI, em);
+        MenuBar menubar = buildMenuBar(textGUI, em, rocketService);
         window.setComponent(menubar);
         textGUI.addWindowAndWait(window);
     }
 
-    public static void login(EntityManager em) {
+    public static void login(EntityManager em, RocketService rocketService) {
         final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
-        new LoginWindow(textGUI, em, currentUser);
+        new LoginWindow(textGUI, em, rocketService, currentUser);
     }
 
-    private static MenuBar buildMenuBar(WindowBasedTextGUI textGUI, EntityManager em) {
+    private static MenuBar buildMenuBar(WindowBasedTextGUI textGUI, EntityManager em, RocketService rocketService) {
         MenuBar menubar = new MenuBar();
 
         // "File" menu
         Menu menuFile = new Menu("File");
         menubar.addMenu(menuFile);
         menuFile.addMenuItem("Rocket", () -> {
-                    new BlankWindow(textGUI, em, currentUser);
+                    new BlankWindow(textGUI, em, rocketService, currentUser);
                 }
         );
 
@@ -80,12 +86,27 @@ public class Main {
                 System.exit(0);
         });
 
+        //Repost menu
+        Menu reportMenu = new Menu("Report");
+        menubar.addMenu(reportMenu);
+        reportMenu.addMenuItem("Rocket Report", () -> {
+            //Do something here.
+        });
+
         // "Help" menu
         Menu menuHelp = new Menu("Help");
         menubar.addMenu(menuHelp);
         menuHelp.addMenuItem("About", () -> {
-                MessageDialog.showMessageDialog(
-                        textGUI, "About", "Valluvar Bookstore by Mahaswami Software", MessageDialogButton.OK);
+            MessageDialog.showMessageDialog(
+                    textGUI, "About", "Mahaswami Software Pvt. Ltd.", MessageDialogButton.OK);
+        });
+
+        //Logout menu
+        Menu logoutMenu = new Menu("Logout");
+        menubar.addMenu(logoutMenu);
+        logoutMenu.addMenuItem("Logout", () -> {
+            Main.currentUser = null;
+            login(em, rocketService);
         });
         return menubar;
     }
