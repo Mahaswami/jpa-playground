@@ -7,6 +7,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.mahaswami.training2019.jpa.model.User;
 
 import javax.persistence.*;
 import java.io.IOException;
@@ -17,22 +18,23 @@ import java.util.TimeZone;
 
 public class Main {
 
+    public static User currentUser;
+    private static Screen screen;
+
     public static void main(String[] args) {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
-        Screen screen = null;
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("Publisher");
         EntityManager em = emf.createEntityManager();
-
         try {
             screen = terminalFactory.createScreen();
             screen.startScreen();
-            final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
 
-            final Window window = new BasicWindow("Valluvar Bookstore");
-            MenuBar menubar = buildMenuBar(textGUI, em);
-            window.setComponent(menubar);
-            textGUI.addWindowAndWait(window);
+            if (currentUser != null){
+                start(em);
+            }else {
+                login(em);
+            }
 
         }
         catch (IOException e) {
@@ -50,14 +52,27 @@ public class Main {
         }
     }
 
+    public static void start(EntityManager em) {
+        final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
+        final Window window = new BasicWindow("Mahaswami Software Pvt. Ltd. (" + currentUser.getUsername() + ")");
+        MenuBar menubar = buildMenuBar(textGUI, em);
+        window.setComponent(menubar);
+        textGUI.addWindowAndWait(window);
+    }
+
+    public static void login(EntityManager em) {
+        final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
+        new LoginWindow(textGUI, em, currentUser);
+    }
+
     private static MenuBar buildMenuBar(WindowBasedTextGUI textGUI, EntityManager em) {
         MenuBar menubar = new MenuBar();
 
         // "File" menu
         Menu menuFile = new Menu("File");
         menubar.addMenu(menuFile);
-        menuFile.addMenuItem("Books...", () -> {
-                    new BooksWindow(textGUI, em);
+        menuFile.addMenuItem("Rocket", () -> {
+                    new BlankWindow(textGUI, em, currentUser);
                 }
         );
 
