@@ -8,11 +8,11 @@ import javax.persistence.NamedQuery;
 @Entity
 @NamedQuery(query = "Select r from Rocket r", name = "all_rockets")
 @NamedQuery(query = "Select r from Rocket r where r.id = :id", name = "find_rocket_by_id")
-@NamedQuery(query = "Select r from Rocket r where r.name = :name", name = "find_rocket_by_name")
+@NamedQuery(query = "Select r from Rocket r where r.ssnNumber = :ssnNumber", name = "find_rocket_by_ssn_number")
 public class Rocket implements Serializable {
     @Id  @GeneratedValue
     private long id;
-    private String name;
+    private String ssnNumber;
     private String title;
     private static final long serialVersionUID = 1L;
 
@@ -20,9 +20,9 @@ public class Rocket implements Serializable {
         super();
     }
 
-    public Rocket(String name, String title) {
+    public Rocket(String ssnNumber, String title) {
         super();
-        this.name = name;
+        this.ssnNumber = ssnNumber;
         this.title = title;
     }
 
@@ -30,19 +30,19 @@ public class Rocket implements Serializable {
         return this.id;
     }
 
-    public String getName() {
-        return this.name;
+    public String getSsnNumber() {
+        return this.ssnNumber;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSsnNumber(String ssnNumber) {
+        this.ssnNumber = ssnNumber;
     }
 
-    public String getTheTitle() {
+    public String getTitle() {
         return this.title;
     }
 
-    public void setTheTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 

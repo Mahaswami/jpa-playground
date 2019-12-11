@@ -18,7 +18,7 @@ import java.util.List;
 public class RocketWindow extends BaseWindow {
 
     private static int TITLE_FIELD_INDEX = 0;
-    private static int ISBN_FIELD_INDEX = 1;
+    private static int SSN_NUMBER_FIELD_INDEX = 1;
 
     public RocketWindow(WindowBasedTextGUI textGUI, EntityManager em, RocketService rocketService, User currentUser) {
         super(textGUI, em, rocketService, currentUser);
@@ -28,7 +28,7 @@ public class RocketWindow extends BaseWindow {
         List<String> data = table.getTableModel().getRow(table.getSelectedRow());
         String bookId = data.get(0);
         showInfoMessage("Rocket", "About to Delete Rocket ID: ");
-        Query deleteQuery = em.createNamedQuery("find_book_by_id");
+        Query deleteQuery = em.createNamedQuery("find_rocket_by_id");
         deleteQuery.setParameter("id", new Long(bookId));
         Rocket rocket = (Rocket)deleteQuery.getResultList().get(0);
         em.getTransaction().begin();
@@ -39,64 +39,67 @@ public class RocketWindow extends BaseWindow {
     }
 
     protected void saveRecord() {
-        Rocket newRocket = new Rocket();
-        newRocket.setTheTitle(((TextBox)uiFields.get(0)).getText());
-        em.getTransaction().begin();
-        em.persist(newRocket);
-        em.getTransaction().commit();
 
-        Query findByISBN = em.createNamedQuery("find_book_by_isbn");
-        Rocket rocket = (Rocket)findByISBN.getResultList().get(0);
-        table.getTableModel().addRow(String.valueOf(rocket.getId()), rocket.getTheTitle());
+        String title = ((TextBox)uiFields.get(0)).getText();
+        String ssn = ((TextBox)uiFields.get(1)).getText();
+        rocketService.create(title, ssn);
+        Query findBySSN = em.createNamedQuery("find_rocket_by_ssn_number");
+        findBySSN.setParameter("ssnNumber", ssn);
+        Rocket rocket = (Rocket)findBySSN.getResultList().get(0);
+        table.getTableModel().addRow(String.valueOf(rocket.getId()), rocket.getTitle(), rocket.getSsnNumber());
     }
 
     protected void loadRecord() {
         List<String> data = table.getTableModel().getRow(table.getSelectedRow());
-        Rocket rocket = rocketService.getRocket(new Long(data.get(0)));
+        Rocket rocket = rocketService.findRocket(new Long(data.get(0)));
 
-        if (rocket.getTheTitle() != null)
-            ((TextBox) uiFields.get(TITLE_FIELD_INDEX)).setText(rocket.getTheTitle());
+        if (rocket.getTitle() != null)
+            ((TextBox) uiFields.get(TITLE_FIELD_INDEX)).setText(rocket.getTitle());
+
+        if(rocket.getSsnNumber() != null)
+            ((TextBox) uiFields.get(SSN_NUMBER_FIELD_INDEX)).setText(rocket.getSsnNumber());
     }
 
     protected void updateRecord() {
         try {
             List<String> data = table.getTableModel().getRow(table.getSelectedRow());
             Long id = Long.valueOf(data.get(0));
-            Rocket updateBook = rocketService.findRocket(id);
-            setBookDetails(updateBook);
+            Rocket updateRocket = rocketService.findRocket(id);
+            setRocketDetails(updateRocket);
             rocketService.update();
 
             table.getTableModel().removeRow(table.getSelectedRow());
-            updateTable(updateBook.getId());
+            updateTable(updateRocket.getId());
         } catch (ParseException ex) {
             showInfoMessage("Message","Incorrect Date format");
         }
     }
 
-    private void setBookDetails(Rocket rocket) throws ParseException {
-        rocket.setTheTitle(((TextBox) uiFields.get(TITLE_FIELD_INDEX)).getText());
+    private void setRocketDetails(Rocket rocket) throws ParseException {
+        rocket.setTitle(((TextBox) uiFields.get(TITLE_FIELD_INDEX)).getText());
+        rocket.setSsnNumber(((TextBox) uiFields.get(SSN_NUMBER_FIELD_INDEX)).getText());
     }
 
     private void updateTable(Long id) {
-        Rocket rocket = rocketService.getRocket(new Long(id));
+        Rocket rocket = rocketService.findRocket(new Long(id));
         addRow(rocket);
     }
 
     private void addRow(Rocket rocket) {
-        table.getTableModel().addRow(String.valueOf(rocket.getId()), rocket.getTheTitle());
+        table.getTableModel().addRow(String.valueOf(rocket.getId()), rocket.getTitle());
     }
 
     protected void buildForm(Panel contentPanel) {
+        addField("Rocket SSN Number", new TextBox(new TerminalSize(30,1)));
         addField("Rocket Title", new TextBox(new TerminalSize(30,1)));
-        addField("Rocket ISBN", new TextBox(new TerminalSize(30,1)));
     }
 
     protected void buildTable() {
-        table = new Table<String>("ID", "Title", "ISBN");
-        Query rockets = em.createNamedQuery("all_books");
+        table = new Table<String>("ID", "Title", "SSN NUMBER");
+        Query rockets = em.createNamedQuery("all_rockets");
         List<Rocket> list = rockets.getResultList();
         for (Rocket r: list) {
-            table.getTableModel().addRow(String.valueOf(r.getId()), r.getTheTitle());
+            table.getTableModel().addRow(String.valueOf(r.getId()), r.getTitle(), r.getSsnNumber());
         }
     }
 

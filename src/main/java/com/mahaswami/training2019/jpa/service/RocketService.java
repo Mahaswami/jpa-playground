@@ -1,5 +1,6 @@
 package com.mahaswami.training2019.jpa.service;
 
+import com.googlecode.lanterna.gui2.TextBox;
 import com.mahaswami.training2019.jpa.model.Rocket;
 
 import javax.persistence.EntityManager;
@@ -13,6 +14,19 @@ public class RocketService {
 	public RocketService(EntityManager entityManager) {
 		this.em = entityManager;
 		this.tx = entityManager.getTransaction();
+	}
+
+	public Rocket create(String title, String ssn) {
+		Rocket newRocket = new Rocket();
+		newRocket.setTitle(title);
+		newRocket.setSsnNumber(ssn);
+		em.getTransaction().begin();
+		em.persist(newRocket);
+		em.getTransaction().commit();
+		tx.begin();
+		em.persist(newRocket);
+		tx.commit();
+		return newRocket;
 	}
 
 	public Rocket getRocket(Long id) {

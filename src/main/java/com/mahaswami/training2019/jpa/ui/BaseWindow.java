@@ -28,6 +28,7 @@ public abstract class BaseWindow {
         this.currentUser = curentUser;
         this.rocketService = rocketService;
         BasicWindow myWindow = new BasicWindow(getTitle());
+        System.out.println("curentUser " + curentUser);
 
         if(curentUser != null) {
 

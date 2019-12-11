@@ -78,7 +78,7 @@ public class Main {
         Menu menuFile = new Menu("File");
         menubar.addMenu(menuFile);
         menuFile.addMenuItem("Rocket", () -> {
-                    new BlankWindow(textGUI, em, rocketService, currentUser);
+                    new RocketWindow(textGUI, em, rocketService, currentUser);
                 }
         );
 
