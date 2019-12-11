@@ -70,12 +70,12 @@ public class RocketWindow extends BaseWindow {
 
             table.getTableModel().removeRow(table.getSelectedRow());
             updateTable(updateRocket.getId());
-        } catch (ParseException ex) {
+        } catch (Exception ex) {
             showInfoMessage("Message","Incorrect Date format");
         }
     }
 
-    private void setRocketDetails(Rocket rocket) throws ParseException {
+    private void setRocketDetails(Rocket rocket) {
         rocket.setTitle(((TextBox) uiFields.get(TITLE_FIELD_INDEX)).getText());
         rocket.setSsnNumber(((TextBox) uiFields.get(SSN_NUMBER_FIELD_INDEX)).getText());
     }
@@ -86,7 +86,7 @@ public class RocketWindow extends BaseWindow {
     }
 
     private void addRow(Rocket rocket) {
-        table.getTableModel().addRow(String.valueOf(rocket.getId()), rocket.getTitle());
+        table.getTableModel().addRow(String.valueOf(rocket.getId()), rocket.getTitle(), rocket.getSsnNumber());
     }
 
     protected void buildForm(Panel contentPanel) {
